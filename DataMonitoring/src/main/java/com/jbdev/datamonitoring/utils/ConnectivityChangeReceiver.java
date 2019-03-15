@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.PowerManager;
@@ -60,7 +61,7 @@ public class ConnectivityChangeReceiver extends BroadcastReceiver {
         return imsiName;
     }
 
-    @SuppressLint("MissingPermission")
+
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.i(TAG, "OnReceiver");
@@ -79,7 +80,13 @@ public class ConnectivityChangeReceiver extends BroadcastReceiver {
         } else {
             Log.v(TAG, "no extras");
         }
+        processUpdate();
 
+
+    }
+
+    @SuppressLint("MissingPermission")
+    public void processUpdate() {
         MainActivity activity = MainActivity.getInstance();
         if (activity == null) {
             return;
@@ -164,53 +171,64 @@ public class ConnectivityChangeReceiver extends BroadcastReceiver {
 
 
         // Bundle extras = intent.getExtras();
-        if (extras != null) {
+        ConnectivityManager cm = (ConnectivityManager) activity.getSystemService(Context.CONNECTIVITY_SERVICE);
+        String reason;
+        if (cm != null) {
 
 
-            NetworkInfo networkInfo = (NetworkInfo) extras.get("networkInfo");
-            switch (networkInfo.getDetailedState()) {
-                case AUTHENTICATING:
-                    stateString = "AUTHENTICATING";
-                    break;
-                case BLOCKED:
-                    stateString = "BLOCKED";
-                    break;
-                case CAPTIVE_PORTAL_CHECK:
-                    stateString = "CAPTIVE_PORTAL_CHECK";
-                    break;
-                case CONNECTED:
-                    stateString = "CONNECTED";
-                    break;
-                case CONNECTING:
-                    stateString = "CONNECTING";
-                    break;
-                case DISCONNECTED:
-                    stateString = "DISCONNECTED";
-                    break;
-                case DISCONNECTING:
-                    stateString = "DISCONNECTING";
-                    break;
-                case IDLE:
-                    stateString = "IDLE";
-                    break;
-                case OBTAINING_IPADDR:
-                    stateString = "OBTAINING_IPADDR";
-                    break;
-                case SCANNING:
-                    stateString = "SCANNING";
-                    break;
-                case SUSPENDED:
-                    stateString = "SUSPENDED";
-                    break;
-                case VERIFYING_POOR_LINK:
-                    stateString = "VERIFYING_POOR_LINK";
-                    break;
-                case FAILED:
-                    stateString = "FAILED";
-                    break;
+            NetworkInfo networkInfo = (NetworkInfo) cm.getActiveNetworkInfo();
+            if(networkInfo != null) {
+                switch (networkInfo.getDetailedState()) {
+                    case AUTHENTICATING:
+                        stateString = "AUTHENTICATING";
+                        break;
+                    case BLOCKED:
+                        stateString = "BLOCKED";
+                        break;
+                    case CAPTIVE_PORTAL_CHECK:
+                        stateString = "CAPTIVE_PORTAL_CHECK";
+                        break;
+                    case CONNECTED:
+                        stateString = "CONNECTED";
+                        break;
+                    case CONNECTING:
+                        stateString = "CONNECTING";
+                        break;
+                    case DISCONNECTED:
+                        stateString = "DISCONNECTED";
+                        break;
+                    case DISCONNECTING:
+                        stateString = "DISCONNECTING";
+                        break;
+                    case IDLE:
+                        stateString = "IDLE";
+                        break;
+                    case OBTAINING_IPADDR:
+                        stateString = "OBTAINING_IPADDR";
+                        break;
+                    case SCANNING:
+                        stateString = "SCANNING";
+                        break;
+                    case SUSPENDED:
+                        stateString = "SUSPENDED";
+                        break;
+                    case VERIFYING_POOR_LINK:
+                        stateString = "VERIFYING_POOR_LINK";
+                        break;
+                    case FAILED:
+                        stateString = "FAILED";
+                        break;
 
-                default:
-                    stateString = "" + networkInfo.getDetailedState();
+                    default:
+                        stateString = "" + networkInfo.getDetailedState();
+                }
+                reason = networkInfo.getReason();
+                if (reason == null) {
+                    reason = "None";
+                }
+            }else {
+                stateString = "DISCONNECTED";
+                reason = "None";
             }
 
             if (!stateString.equals("CONNECTED") && timer == null) {
@@ -247,10 +265,7 @@ public class ConnectivityChangeReceiver extends BroadcastReceiver {
             Logger.dump("Last Value:" + lastState + ", " + lastNetworkTypeString + ", " + lastOperatorName + ", " + lastImsiName);
             Logger.dump("New Value :" + stateString + ", " + networkTypeString + ", " + operatorName + ", " + imsiName);
 
-            String reason = networkInfo.getReason();
-            if (reason == null) {
-                reason = "None";
-            }
+
             if (!stateString.equals(lastState) || !networkTypeString.equals(lastNetworkTypeString) || !operatorName.equals(lastOperatorName) || !imsiName.equals(lastImsiName)) {
                 CurrentStateAndLocation currentStateAndLocation = CurrentStateAndLocation.getInstance();
                 currentStateAndLocation.imsi = imsiName;
@@ -266,7 +281,6 @@ public class ConnectivityChangeReceiver extends BroadcastReceiver {
             }
 
         }
-
 
     }
 

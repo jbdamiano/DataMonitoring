@@ -25,6 +25,7 @@ import java.util.List;
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
+    boolean move = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +35,27 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+    }
+
+    private void display(LatLng pos, String etat, String subscriber, String imsi) {
+        MarkerOptions markerOptions = new MarkerOptions();
+        markerOptions.title(subscriber + ":" + imsi);
+        markerOptions.visible(true);
+        markerOptions.position(pos);
+        if (etat.equals("CONNECTED")) {
+            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+        } else if (etat.equals("DISCONNECTED")) {
+            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+        } else {
+            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW));
+
+        }
+        mMap.addMarker(markerOptions);
+        if (!move) {
+            mMap.moveCamera(CameraUpdateFactory.newLatLng(pos));
+            mMap.animateCamera(CameraUpdateFactory.zoomTo(15), 2000, null);
+            move = true;
+        }
     }
 
 
@@ -49,7 +71,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        boolean move = false;
+
+        boolean toDisplay = false;
 
         List<State> states = StatesCollection.getInstamce().getList();
 
@@ -57,7 +80,14 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         LatLng oldpos = null;
         String oldEtat = null;
+        String oldSubscriber= null;
+        String oldImsi = null;
+
         for (State state : states) {
+
+            if (state.getLatitude() == 0 && state.getLongitude() == 0) {
+                continue;
+            }
             LatLng pos = new LatLng(state.getLatitude(), state.getLongitude());
 
             String etat = state.getState();
@@ -66,10 +96,18 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             int trace = state.getTrace();
             boolean traced = false;
 
+
+            if (trace == 0) {
+                display(pos, etat, subscriber, imsi);
+            }
+
             if (trace == 1) {
                 if (oldpos == null) {
                     oldpos = pos;
                     oldEtat = etat;
+                    oldSubscriber = subscriber;
+                    oldImsi = imsi;
+                    display(pos, etat, subscriber, imsi);
                 } else {
                     int color;
                     if (oldEtat.equals("CONNECTED")) {
@@ -80,37 +118,27 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                         color = Color.YELLOW;
 
                     }
-                    Polyline line = mMap.addPolyline(new PolylineOptions()
+                    mMap.addPolyline(new PolylineOptions()
                             .add(oldpos, pos)
-                            .width(5)
+                            .width(15)
                             .color(color));
+                    if (!oldEtat.equals(etat)) {
+                        display(oldpos, oldEtat, oldSubscriber, oldImsi);
+                        display(pos, etat, subscriber, imsi);
+
+                    }
                     oldpos = pos;
                     oldEtat = etat;
-
                 }
 
             } else {
+                if (oldpos != null) {
+                    display(oldpos, oldEtat, oldSubscriber, oldImsi);
+                }
                 oldpos = null;
             }
 
-            MarkerOptions markerOptions = new MarkerOptions();
-            markerOptions.title(subscriber + ":" + imsi);
-            markerOptions.visible(true);
-            markerOptions.position(pos);
-            if (etat.equals("CONNECTED")) {
-                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
-            } else if (etat.equals("DISCONNECTED")) {
-                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
-            } else {
-                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW));
 
-            }
-            mMap.addMarker(markerOptions);
-            if (!move) {
-                mMap.moveCamera(CameraUpdateFactory.newLatLng(pos));
-                mMap.animateCamera(CameraUpdateFactory.zoomTo(15), 2000, null);
-                move = true;
-            }
         }
 
         ;

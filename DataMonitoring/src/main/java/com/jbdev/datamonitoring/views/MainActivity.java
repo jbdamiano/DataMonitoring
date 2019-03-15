@@ -61,7 +61,7 @@ import com.jbdev.datamonitoring.services.BackgroundStateService;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
-    private com.jbdev.datamonitoring.views.StatesAdapter mAdapter;
+    static private com.jbdev.datamonitoring.views.StatesAdapter mAdapter;
 
     protected RecyclerView recyclerView;
     public DatabaseHelper db;
@@ -110,10 +110,14 @@ public class MainActivity extends AppCompatActivity
 
         db = new DatabaseHelper(this);
         statesCollection = StatesCollection.getInstamce();
-
+        statesCollection.clear();
         statesCollection.addAll(db.getAllStates());
 
-        mAdapter = new StatesAdapter(this, statesCollection.getList());
+        if (mAdapter == null) {
+            mAdapter = new StatesAdapter(this, statesCollection.getList());
+        } else {
+            mAdapter.updateData(statesCollection.getList());
+        }
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -414,6 +418,7 @@ public class MainActivity extends AppCompatActivity
                     public void onClick(DialogInterface dialog, int which) {
                         // here you can add functions
                         Intent intent = new Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS);
+                        intent.setData(Uri.parse("package:" + getPackageName()));
                         startActivity(intent);
                     }
                 });
@@ -446,6 +451,8 @@ public class MainActivity extends AppCompatActivity
             }
             final Intent intent = new Intent(this.getApplication(), BackgroundLocationService.class);
             this.getApplication().startService(intent);
+
+            //startStateService();
 
         }
     }
