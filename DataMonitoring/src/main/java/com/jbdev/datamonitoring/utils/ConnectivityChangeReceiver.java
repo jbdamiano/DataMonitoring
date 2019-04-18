@@ -148,7 +148,7 @@ public class ConnectivityChangeReceiver extends BroadcastReceiver {
 
         String operatorName = teleman.getNetworkOperatorName();
         @SuppressLint("HardwareIds") String imsi = teleman.getSubscriberId();
-        String imsiName = "Unkown";
+        String imsiName = "Unknown";
         if (imsi != null) {
             String subsim = imsi.substring(0, 5);
 
@@ -243,11 +243,11 @@ public class ConnectivityChangeReceiver extends BroadcastReceiver {
                                 return;
                             }
                             CurrentStateAndLocation currentStateAndLocation = CurrentStateAndLocation.getInstance();
-                            currentStateAndLocation.imsi = imsi;
-                            currentStateAndLocation.operator = "";
-                            currentStateAndLocation.subtype = "";
-                            currentStateAndLocation.reason = "";
-                            currentStateAndLocation.state = lastState;
+                            currentStateAndLocation.setImsi(imsi);
+                            currentStateAndLocation.setOperator("");
+                            currentStateAndLocation.setSubtype("");
+                            currentStateAndLocation.setReason("");
+                            currentStateAndLocation.setState(lastState);
                             activity.createState(lastState, "", "", "", imsi);
                             lastImsiName = imsi;
                         }
@@ -268,11 +268,11 @@ public class ConnectivityChangeReceiver extends BroadcastReceiver {
 
             if (!stateString.equals(lastState) || !networkTypeString.equals(lastNetworkTypeString) || !operatorName.equals(lastOperatorName) || !imsiName.equals(lastImsiName)) {
                 CurrentStateAndLocation currentStateAndLocation = CurrentStateAndLocation.getInstance();
-                currentStateAndLocation.imsi = imsiName;
-                currentStateAndLocation.operator = operatorName;
-                currentStateAndLocation.subtype = networkTypeString;
-                currentStateAndLocation.reason = reason;
-                currentStateAndLocation.state = stateString;
+                currentStateAndLocation.setImsi(imsiName);
+                currentStateAndLocation.setOperator(operatorName);
+                currentStateAndLocation.setSubtype(networkTypeString);
+                currentStateAndLocation.setReason(reason);
+                currentStateAndLocation.setState(stateString);
                 activity.createState(stateString, reason, networkTypeString, operatorName, imsiName);
                 lastState = stateString;
                 lastNetworkTypeString = networkTypeString;

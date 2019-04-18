@@ -1,139 +1,166 @@
 package com.jbdev.datamonitoring.database.model;
 
 public class State {
-  public static final String TABLE_NAME = "states";
+    public static final String TABLE_NAME = "states";
 
-  public static final String COLUMN_ID = "id";
-  public static final String COLUMN_STATE = "state";
-  public static final String COLUMN_NETWORKTYPE = "networktype";
-  public static final String COLUMN_OPERATOR = "operator";
-  public static final String COLUMN_IMSI = "imsi";
-  public static final String COLUMN_LATITUDE = "latitude";
-  public static final String COLUMN_LONGITUDE = "longitude";
+    public static final String COLUMN_ID = "id";
+    public static final String COLUMN_STATE = "state";
+    public static final String COLUMN_NETWORKTYPE = "networktype";
+    public static final String COLUMN_OPERATOR = "operator";
+    public static final String COLUMN_IMSI = "imsi";
+    public static final String COLUMN_LATITUDE = "latitude";
+    public static final String COLUMN_LONGITUDE = "longitude";
 
-  public static final String COLUMN_TIMESTAMP = "timestamp";
-  public static final String COLUMN_REASON = "reason";
-  public static final String COLUMN_TRACE = "trace";
+    public static final String COLUMN_TIMESTAMP = "timestamp";
+    public static final String COLUMN_REASON = "reason";
+    public static final String COLUMN_TRACE = "trace";
+    public static final String COLUMN_PROVIDER = "provider";
+    public static final String COLUMN_SPEED = "speed";
+    private int id;
+    private String state;
+    private String subtype;
+    private String timestamp;
+    private Double longitude;
+    private Double latitude;
+    private String operator;
+    private String imsi;
+    private String reason;
+    private String provider;
+    private Float speed;
+    private int trace;
 
-  private int id;
-  private String state;
-  private String subtype;
-  private String timestamp;
-  private Double longitude;
-  private Double latitude;
-  private String operator;
-  private String imsi;
-  private String reason;
-  private int trace;
+    // Create table SQL query
+    public static final String CREATE_TABLE =
+            "CREATE TABLE " + TABLE_NAME + "("
+                    + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                    + COLUMN_STATE + " TEXT,"
+                    + COLUMN_REASON + " TEXT,"
+                    + COLUMN_NETWORKTYPE + " TEXT,"
+                    + COLUMN_OPERATOR + " TEXT,"
+                    + COLUMN_IMSI + " TEXT,"
+                    + COLUMN_LATITUDE + " REAL,"
+                    + COLUMN_LONGITUDE + " REAL,"
+                    + COLUMN_PROVIDER + " TEXT,"
+                    + COLUMN_SPEED + " REAL,"
+                    + COLUMN_TRACE + " INTEGER,"
+                    + COLUMN_TIMESTAMP + " TEXT DEFAULT (strftime('%Y-%m-%dT%H:%M','now', 'localtime'))"
+                    + ")";
 
-  // Create table SQL query
-  public static final String CREATE_TABLE =
-      "CREATE TABLE " + TABLE_NAME + "("
-          + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
-          + COLUMN_STATE + " TEXT,"
-          + COLUMN_REASON + " TEXT,"
-          + COLUMN_NETWORKTYPE + " TEXT,"
-          + COLUMN_OPERATOR + " TEXT,"
-          + COLUMN_IMSI + " TEXT,"
-          + COLUMN_LATITUDE + " REAL,"
-          + COLUMN_LONGITUDE + " REAL,"
-              + COLUMN_TRACE + " INTEGER,"
-          + COLUMN_TIMESTAMP + " TEXT DEFAULT (strftime('%Y-%m-%dT%H:%M','now', 'localtime'))"
-          + ")";
+    public State() {
+    }
 
-  public State() {
-  }
+    public State(int id, String state, String reason, String subtype, String timestamp, String operator, String imsi, Double latitude, Double longitude, int trace, String provider, Float speed) {
+        this.id = id;
+        this.state = state;
+        this.reason = reason;
+        this.subtype = subtype;
+        this.timestamp = timestamp;
+        this.longitude = longitude;
+        this.latitude = latitude;
+        this.operator = operator;
+        this.imsi = imsi;
+        this.trace = trace;
+        this.provider = provider;
+        this.speed = speed;
+    }
 
-  public State(int id, String state, String reason, String subtype, String timestamp, String operator, String imsi, Double latitude, Double longitude, int trace) {
-    this.id = id;
-    this.state = state;
-    this.reason = reason;
-    this.subtype = subtype;
-    this.timestamp = timestamp;
-    this.longitude = longitude;
-    this.latitude = latitude;
-    this.operator = operator;
-    this.imsi = imsi;
-    this.trace = trace;
-  }
+    public Float getSpeed() {
+        return speed;
+    }
 
-  public int getTrace() {
-    return trace;
-  }
+    public void setSpeed(Float speed) {
+        this.speed = speed;
+    }
 
-  public void setTrace(int trace) {
-    this.trace = trace;
-  }
+    public String getProvider() {
+        if (provider == null) {
+            return "NDF";
+        }
 
-  public int getId() {
-    return id;
-  }
+        return provider;
+    }
 
-  public String getState() {
-    return state;
-  }
+    public void setProvider(String provider) {
+        this.provider = provider;
+    }
 
-  public void setState(String state) {
-    this.state = state;
-  }
+    public int getTrace() {
+        return trace;
+    }
 
-  public String getReason() {
-    return reason;
-  }
+    public void setTrace(int trace) {
+        this.trace = trace;
+    }
 
-  public void setReason(String reason) {
-    this.reason = reason;
-  }
+    public int getId() {
+        return id;
+    }
 
-  public String getSubtype() {
-    return subtype;
-  }
+    public String getState() {
+        return state;
+    }
 
-  public void setSubtype(String subtype) {
-    this.subtype = subtype;
-  }
+    public void setState(String state) {
+        this.state = state;
+    }
 
-  public String getTimestamp() {
-    return timestamp;
-  }
+    public String getReason() {
+        return reason;
+    }
 
-  public void setId(int id) {
-    this.id = id;
-  }
+    public void setReason(String reason) {
+        this.reason = reason;
+    }
 
-  public void setTimestamp(String timestamp) {
-    this.timestamp = timestamp;
-  }
+    public String getSubtype() {
+        return subtype;
+    }
 
-  public Double getLongitude() {
-    return longitude;
-  }
+    public void setSubtype(String subtype) {
+        this.subtype = subtype;
+    }
 
-  public void setLongitude(Double longitude) {
-    this.longitude = longitude;
-  }
+    public String getTimestamp() {
+        return timestamp;
+    }
 
-  public Double getLatitude() {
-    return latitude;
-  }
+    public void setId(int id) {
+        this.id = id;
+    }
 
-  public void setLatitude(Double latitude) {
-    this.latitude = latitude;
-  }
+    public void setTimestamp(String timestamp) {
+        this.timestamp = timestamp;
+    }
 
-  public void setImsi(String imsi) {
-    this.imsi = imsi;
-  }
+    public Double getLongitude() {
+        return longitude;
+    }
 
-  public void setOperator(String operator) {
-    this.operator = operator;
-  }
+    public void setLongitude(Double longitude) {
+        this.longitude = longitude;
+    }
 
-  public String getImsi() {
-    return imsi;
-  }
+    public Double getLatitude() {
+        return latitude;
+    }
 
-  public String getOperator() {
-    return operator;
-  }
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
+    }
+
+    public void setImsi(String imsi) {
+        this.imsi = imsi;
+    }
+
+    public void setOperator(String operator) {
+        this.operator = operator;
+    }
+
+    public String getImsi() {
+        return imsi;
+    }
+
+    public String getOperator() {
+        return operator;
+    }
 }

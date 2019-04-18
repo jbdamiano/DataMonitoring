@@ -18,7 +18,7 @@ import com.jbdev.datamonitoring.database.model.State;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
   // Database Version
-  private static final int DATABASE_VERSION = 5;
+  private static final int DATABASE_VERSION = 6;
 
   // Database Name
   private static final String DATABASE_NAME = "notes_db";
@@ -46,7 +46,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     onCreate(db);
   }
 
-  public long insertState(String state, String reason, String subtype, String operator, String imsi, Double latitude, Double longitude, int trace) {
+  public long insertState(String state, String reason, String subtype, String operator, String imsi, Double latitude, Double longitude, int trace, String provider, Float speed) {
     // get writable database as we want to write data
     SQLiteDatabase db = this.getWritableDatabase();
 
@@ -61,6 +61,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     values.put(State.COLUMN_LATITUDE, latitude);
     values.put(State.COLUMN_LONGITUDE, longitude);
     values.put(State.COLUMN_TRACE, trace);
+    values.put(State.COLUMN_PROVIDER, provider);
+    values.put(State.COLUMN_SPEED, speed);
 
     // insert row
     long id = db.insert(State.TABLE_NAME, null, values);
@@ -81,7 +83,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         new String[]{State.COLUMN_ID, State.COLUMN_STATE, State.COLUMN_REASON,
                 State.COLUMN_NETWORKTYPE, State.COLUMN_TIMESTAMP, State.COLUMN_OPERATOR,
                 State.COLUMN_IMSI, State.COLUMN_LONGITUDE, State.COLUMN_LATITUDE,
-                State.COLUMN_TRACE},
+                State.COLUMN_TRACE, State.COLUMN_PROVIDER, State.COLUMN_SPEED},
         State.COLUMN_ID + "=?",
         new String[]{String.valueOf(id)}, null, null, null, null);
 
@@ -99,7 +101,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.getString(cursor.getColumnIndex(State.COLUMN_IMSI)),
         cursor.getDouble(cursor.getColumnIndex(State.COLUMN_LATITUDE)),
         cursor.getDouble(cursor.getColumnIndex(State.COLUMN_LONGITUDE)),
-            cursor.getInt(cursor.getColumnIndex(State.COLUMN_TRACE)));
+        cursor.getInt(cursor.getColumnIndex(State.COLUMN_TRACE)),
+        cursor.getString(cursor.getColumnIndex(State.COLUMN_PROVIDER)),
+        cursor.getFloat(cursor.getColumnIndex(State.COLUMN_SPEED))
+            );
 
     // close the db connection
     cursor.close();
@@ -131,7 +136,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         state.setOperator(cursor.getString(cursor.getColumnIndex(State.COLUMN_OPERATOR)));
         state.setImsi(cursor.getString(cursor.getColumnIndex(State.COLUMN_IMSI)));
         state.setTrace(cursor.getInt(cursor.getColumnIndex(State.COLUMN_TRACE)));
-
+        state.setProvider(cursor.getString(cursor.getColumnIndex(State.COLUMN_PROVIDER)));
+        state.setSpeed(cursor.getFloat(cursor.getColumnIndex(State.COLUMN_SPEED)));
         states.add(state);
       } while (cursor.moveToNext());
     }

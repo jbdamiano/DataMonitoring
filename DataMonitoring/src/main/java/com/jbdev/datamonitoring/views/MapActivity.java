@@ -1,10 +1,9 @@
 package com.jbdev.datamonitoring.views;
 
 import android.graphics.Color;
-import android.os.PowerManager;
-import android.support.v4.app.FragmentActivity;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -13,13 +12,11 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.jbdev.datamonitoring.R;
 import com.jbdev.datamonitoring.database.model.State;
 import com.jbdev.datamonitoring.datas.StatesCollection;
 
-import java.util.Collections;
 import java.util.List;
 
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
@@ -38,17 +35,22 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     }
 
     private void display(LatLng pos, String etat, String subscriber, String imsi) {
+        Log.d("MApActivity", "display " + pos + " " + etat);
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.title(subscriber + ":" + imsi);
         markerOptions.visible(true);
         markerOptions.position(pos);
-        if (etat.equals("CONNECTED")) {
-            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
-        } else if (etat.equals("DISCONNECTED")) {
-            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
-        } else {
-            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW));
+        switch (etat) {
+            case "CONNECTED":
+                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+                break;
+            case "DISCONNECTED":
+                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+                break;
+            default:
+                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW));
 
+                break;
         }
         mMap.addMarker(markerOptions);
         if (!move) {
@@ -72,8 +74,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        boolean toDisplay = false;
-
         List<State> states = StatesCollection.getInstamce().getList();
 
         mMap.clear();
@@ -94,7 +94,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             String subscriber = state.getOperator();
             String imsi = state.getImsi();
             int trace = state.getTrace();
-            boolean traced = false;
 
 
             if (trace == 0) {
@@ -102,21 +101,34 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             }
 
             if (trace == 1) {
+                if (state.getProvider().equals("network") || state.getProvider().equals("NDF")) {
+                    continue;
+                }
                 if (oldpos == null) {
                     oldpos = pos;
                     oldEtat = etat;
                     oldSubscriber = subscriber;
                     oldImsi = imsi;
+                    Log.d("MApActivity", "display oldpos");
                     display(pos, etat, subscriber, imsi);
                 } else {
-                    int color;
-                    if (oldEtat.equals("CONNECTED")) {
-                        color = Color.GREEN;
-                    } else if (oldEtat.equals("DISCONNECTED")) {
-                        color = Color.RED;
-                    } else {
-                        color = Color.YELLOW;
+                    // Discard excessive speed 42m/s => 151.2 km/h
 
+                    if (state.getSpeed() > 42) {
+                        continue;
+                    }
+                    int color;
+                    switch (oldEtat) {
+                        case "CONNECTED":
+                            color = Color.GREEN;
+                            break;
+                        case "DISCONNECTED":
+                            color = Color.RED;
+                            break;
+                        default:
+                            color = Color.YELLOW;
+
+                            break;
                     }
                     mMap.addPolyline(new PolylineOptions()
                             .add(oldpos, pos)
@@ -129,18 +141,22 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     }
                     oldpos = pos;
                     oldEtat = etat;
+                    oldSubscriber = subscriber;
+                    oldImsi = imsi;
                 }
 
             } else {
                 if (oldpos != null) {
+                    Log.d("MApActivity", "display End loop");
                     display(oldpos, oldEtat, oldSubscriber, oldImsi);
                 }
                 oldpos = null;
             }
-
-
         }
-
-        ;
+        if (oldpos != null) {
+            Log.d("MApActivity", "display End loop");
+            display(oldpos, oldEtat, oldSubscriber, oldImsi);
+        }
+        oldpos = null;
     }
 }

@@ -51,7 +51,17 @@ public class StatesAdapter extends RecyclerView.Adapter<StatesAdapter.MyViewHold
     Log.v("TEXT", "updateData " + stateList.size());
     this.statesList = stateList;
 
-    notifyDataSetChanged();
+    MainActivity.getInstance().runOnUiThread(new Runnable() {
+
+      @Override
+      public void run() {
+        notifyDataSetChanged();
+
+      }
+    });
+
+
+
   }
 
 

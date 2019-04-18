@@ -10,54 +10,49 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.telephony.SubscriptionInfo;
-import android.telephony.SubscriptionManager;
-import android.util.Log;
-import android.view.ContextMenu;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MotionEvent;
-import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.telephony.SubscriptionInfo;
+import android.telephony.SubscriptionManager;
+import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
+import android.view.MotionEvent;
 import android.widget.Toast;
 
 import com.jbdev.datamonitoring.R;
+import com.jbdev.datamonitoring.database.DatabaseHelper;
+import com.jbdev.datamonitoring.database.model.State;
+import com.jbdev.datamonitoring.datas.StatesCollection;
+import com.jbdev.datamonitoring.services.BackgroundLocationService;
+import com.jbdev.datamonitoring.services.BackgroundStateService;
+import com.jbdev.datamonitoring.utils.CurrentStateAndLocation;
+import com.jbdev.datamonitoring.utils.Logger;
+import com.jbdev.datamonitoring.utils.MyDividerItemDecoration;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
-import java.util.ArrayList;
 import java.util.List;
-
-import com.jbdev.datamonitoring.datas.StatesCollection;
-import com.jbdev.datamonitoring.utils.CurrentStateAndLocation;
-import com.jbdev.datamonitoring.utils.Logger;
-import com.jbdev.datamonitoring.utils.MyDividerItemDecoration;
-import com.jbdev.datamonitoring.database.DatabaseHelper;
-import com.jbdev.datamonitoring.database.model.State;
-import com.jbdev.datamonitoring.services.BackgroundLocationService;
-import com.jbdev.datamonitoring.services.BackgroundStateService;
-
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -72,16 +67,13 @@ public class MainActivity extends AppCompatActivity
     public BackgroundLocationService gpsService;
     public boolean stateServiceStarted = false;
     static private boolean locationChangeRecording = false;
-    static private Menu menu;
     static private boolean updated = false;
-
 
     public static MainActivity getInstance() {
         return instance;
     }
 
     public void startStateService() {
-
         if (!stateServiceStarted) {
             final Intent intentState = new Intent(this.getApplication(), BackgroundStateService.class);
             this.getApplication().startService(intentState);
@@ -93,9 +85,8 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
 
         if (instance == null) {
             instance = this;
@@ -106,7 +97,6 @@ public class MainActivity extends AppCompatActivity
         //CoordinatorLayout coordinatorLayout = findViewById(R.id.coordinator_layout);
         recyclerView = findViewById(R.id.recycler_view);
         //TextView noNotesView = findViewById(R.id.empty_state_view);
-
 
         db = new DatabaseHelper(this);
         statesCollection = StatesCollection.getInstamce();
@@ -141,25 +131,20 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-
-//        this.getApplication().startForegroundService(intent);
-        //  this.getApplication().bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
-        //gpsService.startTracking();
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         startRecording(updated);
     }
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -167,10 +152,9 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
+    public boolean onNavigationItemSelected(@NotNull MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
@@ -233,7 +217,6 @@ public class MainActivity extends AppCompatActivity
                 // getting iccId
                 iccId = si.getIccId();
             }
-            //Dispaya warning message
             AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this); //Read Update
             builder.setTitle("ICCID");
             builder.setMessage(iccId);
@@ -261,7 +244,7 @@ public class MainActivity extends AppCompatActivity
             invalidateOptionsMenu();
         }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
@@ -290,10 +273,8 @@ public class MainActivity extends AppCompatActivity
         return locationChangeRecording;
     }
 
-
-
     private void updateMenuTitle() {
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        NavigationView navigationView = findViewById(R.id.nav_view);
         if (navigationView == null) {
             return;
         }
@@ -309,7 +290,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void startRecording(boolean value) {
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        NavigationView navigationView = findViewById(R.id.nav_view);
         if (navigationView == null) {
             return;
         }
@@ -419,7 +400,11 @@ public class MainActivity extends AppCompatActivity
                         // here you can add functions
                         Intent intent = new Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS);
                         intent.setData(Uri.parse("package:" + getPackageName()));
-                        startActivity(intent);
+                        try {
+                            startActivity(intent);
+                        }catch(Exception ignored) {
+
+                        }
                     }
                 });
 
@@ -452,7 +437,7 @@ public class MainActivity extends AppCompatActivity
             final Intent intent = new Intent(this.getApplication(), BackgroundLocationService.class);
             this.getApplication().startService(intent);
 
-            //startStateService();
+            startStateService();
 
         }
     }
@@ -461,10 +446,7 @@ public class MainActivity extends AppCompatActivity
 
         PowerManager pwrm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
         String name = getPackageName();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            return !pwrm.isIgnoringBatteryOptimizations(name);
-        }
-        return false;
+        return !pwrm.isIgnoringBatteryOptimizations(name);
     }
 
     @Override
@@ -514,7 +496,7 @@ public class MainActivity extends AppCompatActivity
             final boolean newFile = myFile.createNewFile();
             FileOutputStream fOut = new FileOutputStream(myFile);
             OutputStreamWriter myOutWriter = new OutputStreamWriter(fOut);
-            myOutWriter.append("timestamp;state;reason;networktype;operator;imsi;latitude;longitude;recording\n");
+            myOutWriter.append("timestamp;state;reason;networktype;operator;imsi;latitude;longitude;recording;gps operator; speed\n");
             List<State> states = db.getAllStates();
             for (State state : states) {
                 myOutWriter.append(state.getTimestamp()).append(";").append(state.getState()).
@@ -523,7 +505,8 @@ public class MainActivity extends AppCompatActivity
                         append(";").append(state.getImsi()).append(";").
                         append(String.valueOf(state.getLatitude())).append(";").
                         append(String.valueOf(state.getLongitude())).append(";").
-                        append(String.valueOf(state.getTrace())).append("\n");
+                        append(String.valueOf(state.getTrace())).append(";").
+                        append(state.getProvider()).append(";").append(String.valueOf(state.getSpeed())).append("\n");
             }
             myOutWriter.close();
             Uri u1;
@@ -562,7 +545,7 @@ public class MainActivity extends AppCompatActivity
 
 
     public void createState(String state, String reason, String subtype, String operator, String imsi) {
-        long id = db.insertState(state, reason, subtype, operator, imsi, currentStateAndLocation.latitude, currentStateAndLocation.longitude, locationChangeRecording ? 1 : 0);
+        long id = db.insertState(state, reason, subtype, operator, imsi, currentStateAndLocation.getLatitude(), currentStateAndLocation.getLongitude(), locationChangeRecording ? 1 : 0, currentStateAndLocation.getProvider(), currentStateAndLocation.getSpeed());
 
         State n = db.getState(id);
 

@@ -45,17 +45,25 @@ public class BackgroundLocationService extends Service {
 
     @Override
     public void onLocationChanged(Location location) {
-
       Log.i(TAG, "LocationChanged: " + location);
-      currentStateAndLocation.longitude = location.getLongitude();
-      currentStateAndLocation.latitude = location.getLatitude();
+      // Discard excessive speed 42m/s => 151.2 km/h
+      //if (location.getSpeed() > 42) {
+      //  return;
+      //}
+      Log.i(TAG, location.getProvider());
+      Log.i(TAG, "" + location.getAccuracy());
+
+      currentStateAndLocation.setLongitude(location.getLongitude());
+      currentStateAndLocation.setSpeed(location.getSpeed());
+      currentStateAndLocation.setLatitude(location.getLatitude());
+      currentStateAndLocation.setProvider(location.getProvider());
       if (MainActivity.getInstance().isLocationChangeRecording()){
-        MainActivity.getInstance().createState(currentStateAndLocation.state,
-            currentStateAndLocation.reason, currentStateAndLocation.subtype,
-            currentStateAndLocation.operator,currentStateAndLocation.imsi);
+        MainActivity.getInstance().createState(currentStateAndLocation.getState(),
+            currentStateAndLocation.getReason(), currentStateAndLocation.getSubtype(),
+            currentStateAndLocation.getOperator(),currentStateAndLocation.getImsi());
       }
 
-      MainActivity.getInstance().startStateService();
+      //MainActivity.getInstance().startStateService();
     }
 
 
