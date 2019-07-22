@@ -551,7 +551,10 @@ public class MainActivity extends AppCompatActivity
 
 
     public void createState(String state, String reason, String subtype, String operator, String imsi) {
-        long id = db.insertState(state, reason, subtype, operator, imsi, currentStateAndLocation.getLatitude(), currentStateAndLocation.getLongitude(), locationChangeRecording ? 1 : 0, currentStateAndLocation.getProvider(), currentStateAndLocation.getSpeed());
+        long id = db.insertState(state, reason, subtype, operator, imsi,
+                currentStateAndLocation.getLatitude(), currentStateAndLocation.getLongitude(),
+                locationChangeRecording ? 1 : 0,
+                currentStateAndLocation.getProvider(), currentStateAndLocation.getSpeed());
 
         State n = db.getState(id);
 
@@ -570,8 +573,8 @@ public class MainActivity extends AppCompatActivity
     public void startServerService() {
 
         Log.d("Main", "Start service ICI");
-        Intent var2 = new Intent(this.getApplication(), ServerService.class);
-        this.getApplication().startService(var2);
+        Intent intent = new Intent(this.getApplication(), ServerService.class);
+        this.getApplication().startService(intent);
 
     }
 

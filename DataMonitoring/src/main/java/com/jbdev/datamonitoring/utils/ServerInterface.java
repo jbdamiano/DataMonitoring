@@ -30,67 +30,64 @@ public class ServerInterface {
     public static String token = "";
 
     public ServerInterface() {
-            super();
+        super();
     }
 
 
 
     public static void closeQuietly(Closeable var0) {
 
-            if (var0 != null) {
-                try {
-                    var0.close();
-                } catch (IOException var2) {
-                }
+        if (var0 != null) {
+            try {
+                var0.close();
+            } catch (IOException var2) {
             }
+        }
 
     }
 
-    public static void connect(String var0, String var1) throws JSONException, IOException {
-        JSONObject var6 = new JSONObject();
-            var6.put("email", var0);
-            var6.put("password", var1);
-            StringBuilder var3 = new StringBuilder();
-            var3.append("https://");
-            var3.append(host);
-            var3.append("api/users/login");
-            var0 = post(var3.toString(), var6.toString());
-            JSONObject var4 = new JSONObject(var0);
-            if (var4.getString("status").equals("OK")) {
-                String var7 = var4.getJSONObject("user").getString("token");
-                StringBuilder var5 = new StringBuilder();
-                var5.append("Token ");
-                var5.append(var7);
-                token = var5.toString();
-                Log.d("TASK", "start Service");
-                MainActivity.getInstance().startServerService();
-                Log.d("ServiceInterface", var0);
-            } else {
-                throw new IOException();
-            }
+    public static void connect(String email, String passwd) throws JSONException, IOException {
+        JSONObject json = new JSONObject();
+        json.put("email", email);
+        json.put("password", passwd);
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("https://");
+        stringBuilder.append(host);
+        stringBuilder.append("api/users/login");
+        email = post(stringBuilder.toString(), json.toString());
+        JSONObject emailJson = new JSONObject(email);
+        if (emailJson.getString("status").equals("OK")) {
+            String token = emailJson.getJSONObject("user").getString("token");
+            StringBuilder builder = new StringBuilder();
+            builder.append("Token ");
+            builder.append(token);
+            token = builder.toString();
+            MainActivity.getInstance().startServerService();
+        } else {
+            throw new IOException();
+        }
 
     }
 
-    public static String post(String var0, String var1) throws IOException {
+    public static String post(String url, String data) throws IOException {
 
             if (VERSION.SDK_INT > 8) {
                 StrictMode.setThreadPolicy((new Builder()).permitAll().build());
             }
-
-            HttpsURLConnection var3 = (HttpsURLConnection)(new URL(var0)).openConnection();
-            var3.setRequestMethod("POST");
+            HttpsURLConnection httpsURLConnection = (HttpsURLConnection)(new URL(url)).openConnection();
+            httpsURLConnection.setRequestMethod("POST");
             if (!token.isEmpty()) {
-                var3.setRequestProperty("Authorization", token);
+                httpsURLConnection.setRequestProperty("Authorization", token);
             }
 
-            var3.setRequestProperty("Content-Type", "application/json");
-            var3.setRequestProperty("Accept", "*/*");
-            sendData(var3, var1);
-            Integer var4 = var3.getResponseCode();
-            if (var4 > 199 && var4 < 300) {
-                return read(var3.getInputStream());
+            httpsURLConnection.setRequestProperty("Content-Type", "application/json");
+            httpsURLConnection.setRequestProperty("Accept", "*/*");
+            sendData(httpsURLConnection, data);
+            Integer responseCode = httpsURLConnection.getResponseCode();
+            if (responseCode > 199 && responseCode < 300) {
+                return read(httpsURLConnection.getInputStream());
             } else {
-                Log.d("ICI", read(var3.getErrorStream()));
+                Log.d("ICI", read(httpsURLConnection.getErrorStream()));
                 throw new IOException();
             }
 
@@ -114,38 +111,39 @@ public class ServerInterface {
 
     }
 
-    public static void sendData(Double var0, Double var1, String var2, String var3, String var4, Integer var5, String var6, Float var7, String var8, String var9, String var10, Integer var11, Long var12) throws JSONException, IOException {
-         JSONObject var15 = new JSONObject();
-            var15.put("timestamp", var8);
-            var15.put("reason", var9);
-            var15.put("networkType", var10);
-            var15.put("latitude", var0);
-            var15.put("longitude", var1);
-            var15.put("state", var2);
-            var15.put("operator", var3);
-            var15.put("imsi", var4);
-            var15.put("recording", var5);
-            var15.put("gps operator", var6);
-            var15.put("speed", var7);
-            var15.put("id", var11);
-            var15.put("currentId", var12);
-            StringBuilder var14 = new StringBuilder();
-            var14.append("https://");
-            var14.append(host);
-            var14.append("api/users/addEntry");
-            post(var14.toString(), var15.toString());
+    public static void sendData(Double latitude, Double longitude, String state, String operator,
+                                String imsi, Integer recording, String gps, Float speed,
+                                String timestamp, String reason, String networkType, Integer id,
+                                Long currentId) throws JSONException, IOException {
+        JSONObject json = new JSONObject();
+        json.put("timestamp", timestamp);
+        json.put("reason", reason);
+        json.put("networkType", networkType);
+        json.put("latitude", latitude);
+        json.put("longitude", longitude);
+        json.put("state", state);
+        json.put("operator", operator);
+        json.put("imsi", imsi);
+        json.put("recording", recording);
+        json.put("gps operator", gps);
+        json.put("speed", speed);
+        json.put("id", id);
+        json.put("currentId", currentId);
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("https://");
+        stringBuilder.append(host);
+        stringBuilder.append("api/users/addEntry");
+        post(stringBuilder.toString(), json.toString());
 
     }
 
-    public static void sendData(HttpsURLConnection connection, String param1) throws IOException {
-
-        Log.d("TASK Send", param1);
+    public static void sendData(HttpsURLConnection connection, String data) throws IOException {
         // $FF: Couldn't be decompiled
         connection.setDoOutput(true);
 
         OutputStreamWriter out = new OutputStreamWriter(
                 connection.getOutputStream());
-        out.write(param1);
+        out.write(data);
         out.close();
 
     }

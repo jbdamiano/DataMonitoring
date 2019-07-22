@@ -46,10 +46,10 @@ public class ServerService extends IntentService {
 
     }
 
-    public void onHandleIntent(Intent var1) {
+    public void onHandleIntent(Intent intent) {
     }
 
-    public int onStartCommand(Intent var1, int var2, int var3) {
+    public int onStartCommand(Intent intent, int id, int currentId) {
 
         Log.i("ServerService", "In onStartCommand");
         Logger.dump("In onStartCommand");
@@ -63,9 +63,9 @@ public class ServerService extends IntentService {
     }
 
     @TargetApi(14)
-    public void onTaskRemoved(Intent var1) {
+    public void onTaskRemoved(Intent intent) {
 
-        super.onTaskRemoved(var1);
+        super.onTaskRemoved(intent);
         this.timer.cancel();
         Logger.dump("In onTaskRemoved");
         Log.i("ServerService", "In onTaskRemoved");

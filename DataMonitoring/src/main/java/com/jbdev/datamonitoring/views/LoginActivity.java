@@ -26,43 +26,43 @@ public class LoginActivity extends AppCompatActivity {
 
     public LoginActivity() {
 
-            super();
+        super();
     }
 
 
 
-    public void onCreate(Bundle var1) {
-            super.onCreate(var1);
-            this.setContentView(R.layout.login_activity);
-            this.email = (EditText)this.findViewById(R.id.mail);
-            this.password = (EditText)this.findViewById(R.id.password);
-            this.login = (Button)this.findViewById(R.id.login);
-            this.login.setOnClickListener(new OnClickListener() {
-                public static final long serialVersionUID = 3224504583917613180L;
+    public void onCreate(Bundle bundle) {
+        super.onCreate(bundle);
+        this.setContentView(R.layout.login_activity);
+        this.email = (EditText)this.findViewById(R.id.mail);
+        this.password = (EditText)this.findViewById(R.id.password);
+        this.login = (Button)this.findViewById(R.id.login);
+        this.login.setOnClickListener(new OnClickListener() {
+            public static final long serialVersionUID = 3224504583917613180L;
 
 
-                public void onClick(View var1) {
-                        Builder var5;
-                        try {
-                            ServerInterface.connect(email.getText().toString(), password.getText().toString());
-                            //ServerInterface.connect("jbdamiano@gmail.com", "test");
-                            LoginActivity.this.finish();
-                        } catch (JSONException var3) {
-                            var5 = new Builder(LoginActivity.this);
-                            var5.setTitle("Error");
-                            var5.setMessage("User or password are incorrect");
-                            var5.setCancelable(true);
-                            var5.create().show();
-                        } catch (IOException var4) {
-                            var5 = new Builder(LoginActivity.this);
-                            var5.setTitle("Error");
-                            var5.setMessage("User or password are incorrect");
-                            var5.setCancelable(true);
-                            var5.create().show();
-                        }
+            public void onClick(View view) {
+            Builder builder;
+            try {
+                ServerInterface.connect(email.getText().toString(), password.getText().toString());
+                //ServerInterface.connect("jbdamiano@gmail.com", "test");
+                LoginActivity.this.finish();
+            } catch (JSONException var3) {
+                builder = new Builder(LoginActivity.this);
+                builder.setTitle("Error");
+                builder.setMessage("User or password are incorrect");
+                builder.setCancelable(true);
+                builder.create().show();
+            } catch (IOException var4) {
+                builder = new Builder(LoginActivity.this);
+                builder.setTitle("Error");
+                builder.setMessage("User or password are incorrect");
+                builder.setCancelable(true);
+                builder.create().show();
+            }
 
-                }
-            });
-        }
+            }
+        });
+    }
     }
 

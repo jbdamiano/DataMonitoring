@@ -30,21 +30,23 @@ public class Task extends TimerTask {
 
     public void run() {
 
-        Iterator var6 = MainActivity.getInstance().db.getAllStatesSinceId((long)id).iterator();
+        Iterator iterator = MainActivity.getInstance().db.getAllStatesSinceId((long)id).iterator();
 
-        while(var6.hasNext()) {
-            State var2 = (State)var6.next();
+        while(iterator.hasNext()) {
+            State state = (State)iterator.next();
 
             try {
-                ServerInterface.sendData(var2.getLatitude(), var2.getLongitude(), var2.getState(), var2.getOperator(), var2.getImsi(), var2.getTrace(), var2.getProvider(), var2.getSpeed(), var2.getTimestamp(), var2.getReason(), var2.getSubtype(), var2.getId(), currentId);
-                if (var2.getId() > id) {
-                    Long var3 = currentId;
+                ServerInterface.sendData(state.getLatitude(), state.getLongitude(),
+                        state.getState(), state.getOperator(), state.getImsi(), state.getTrace(),
+                        state.getProvider(), state.getSpeed(), state.getTimestamp(),
+                        state.getReason(), state.getSubtype(), state.getId(), currentId);
+                if (state.getId() > id) {
                     currentId = currentId + 1L;
-                    id = var2.getId();
-                    Editor var7 = settings.edit();
-                    var7.putInt("id", id);
-                    var7.putLong("currentId", currentId);
-                    var7.commit();
+                    id = state.getId();
+                    Editor editor = settings.edit();
+                    editor.putInt("id", id);
+                    editor.putLong("currentId", currentId);
+                    editor.commit();
                 }
             } catch (JSONException var4) {
                 var4.printStackTrace();

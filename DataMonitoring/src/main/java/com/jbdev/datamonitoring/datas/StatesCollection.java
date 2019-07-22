@@ -6,36 +6,36 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class StatesCollection {
-  static StatesCollection instamce = null;
+    static StatesCollection instamce = null;
 
-  private List<State> statesList = new ArrayList<>();
+    private List<State> statesList = new ArrayList<>();
 
-  private StatesCollection() {
+    private StatesCollection() {
 
-  }
-
-  static public StatesCollection getInstamce() {
-    if (instamce == null) {
-      instamce = new StatesCollection();
     }
-    return instamce;
-  }
 
-  public void addAll(List<State> data){
-    statesList.addAll(data);
-  }
+    static public StatesCollection getInstamce() {
+        if (instamce == null) {
+            instamce = new StatesCollection();
+        }
+        return instamce;
+    }
 
-  public List<State> getList() {
-    return statesList;
-  }
+    public void addAll(List<State> data){
+        statesList.addAll(data);
+    }
 
-  public void clear() {
-    statesList.clear();
-  }
+    public List<State> getList() {
+        return statesList;
+    }
 
-  public void add(int i, State n) {
-    statesList.add(i, n);
-    //send a refresh intent if needed
+    public void clear() {
+        statesList.clear();
+    }
 
-  }
+    public void add(int i, State n) {
+        statesList.add(i, n);
+        //send a refresh intent if needed
+
+    }
 }

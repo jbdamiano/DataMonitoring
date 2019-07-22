@@ -13,41 +13,41 @@ import java.util.Calendar;
 
 public class Logger {
 
-  private static Logger instance = null;
+    private static Logger instance = null;
 
-  @SuppressLint("SdCardPath")
-  private Logger() {
+    @SuppressLint("SdCardPath")
+    private Logger() {
 
 
-  }
-
-  @SuppressLint({"ShowToast", "SimpleDateFormat"})
-  public static void dump(String value) {
-    if (instance == null) {
-      instance = new Logger();
     }
 
-    try {
+    @SuppressLint({"ShowToast", "SimpleDateFormat"})
+    public static void dump(String value) {
+        if (instance == null) {
+            instance = new Logger();
+        }
 
-      @SuppressLint("SimpleDateFormat") SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
-      Calendar c = Calendar.getInstance();
-      String formattedDate = df.format(c.getTime());
-      @SuppressLint("SdCardPath") File file = new File("/sdcard/logger" + formattedDate + ".txt");
+        try {
 
-      FileOutputStream fOut = new FileOutputStream(file, true);
+            @SuppressLint("SimpleDateFormat") SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
+            Calendar c = Calendar.getInstance();
+            String formattedDate = df.format(c.getTime());
+            @SuppressLint("SdCardPath") File file = new File("/sdcard/logger" + formattedDate + ".txt");
 
-      OutputStreamWriter myOutWriter = new OutputStreamWriter(fOut);
+            FileOutputStream fOut = new FileOutputStream(file, true);
 
-      df = new SimpleDateFormat("yyyy-MM dd_HH:mm:ss");
-      c = Calendar.getInstance();
-      formattedDate = df.format(c.getTime());
-      myOutWriter.append(formattedDate).append(": ").append(value).append("\n");
-      myOutWriter.flush();
-      fOut.flush();
-      fOut.close();
-      myOutWriter.close();
-    } catch (Exception e) {
-      Toast.makeText(MainActivity.getInstance(), "Error exporting", Toast.LENGTH_LONG);
+            OutputStreamWriter myOutWriter = new OutputStreamWriter(fOut);
+
+            df = new SimpleDateFormat("yyyy-MM dd_HH:mm:ss");
+            c = Calendar.getInstance();
+            formattedDate = df.format(c.getTime());
+            myOutWriter.append(formattedDate).append(": ").append(value).append("\n");
+            myOutWriter.flush();
+            fOut.flush();
+            fOut.close();
+            myOutWriter.close();
+        } catch (Exception e) {
+            Toast.makeText(MainActivity.getInstance(), "Error exporting", Toast.LENGTH_LONG);
+        }
     }
-  }
 }
