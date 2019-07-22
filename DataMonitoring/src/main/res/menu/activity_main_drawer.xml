@@ -10,26 +10,34 @@
             android:title="Main" />
 
         <item
+            android:id="@+id/login"
+            android:icon="@drawable/ic_menu_send"
+            android:title="Login to record on server"
+            />
+
+
+        <item
             android:id="@+id/map"
             android:icon="@android:drawable/ic_dialog_map"
             android:title="Map"/>
+
         <item
             android:id="@+id/send"
             android:icon="@android:drawable/ic_menu_send"
-            android:title="send" />
+            android:title="Send" />
         <item
             android:id="@+id/delete"
             android:icon="@android:drawable/ic_menu_delete"
-            android:title="drop data" />
+            android:title="Drop data" />
         <item
             android:id="@+id/iccid"
             android:icon="@android:drawable/ic_menu_info_details"
-            android:title="get iccid" />
+            android:title="Get iccid" />
 
         <item
             android:id="@+id/start"
             android:icon="@android:drawable/ic_menu_compass"
-            android:title="start recording location" />
+            android:title="Start recording location" />
 
 
     </group>

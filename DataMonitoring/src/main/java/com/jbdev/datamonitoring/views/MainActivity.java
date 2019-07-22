@@ -43,6 +43,7 @@ import com.jbdev.datamonitoring.database.model.State;
 import com.jbdev.datamonitoring.datas.StatesCollection;
 import com.jbdev.datamonitoring.services.BackgroundLocationService;
 import com.jbdev.datamonitoring.services.BackgroundStateService;
+import com.jbdev.datamonitoring.services.ServerService;
 import com.jbdev.datamonitoring.utils.CurrentStateAndLocation;
 import com.jbdev.datamonitoring.utils.Logger;
 import com.jbdev.datamonitoring.utils.MyDividerItemDecoration;
@@ -189,6 +190,11 @@ public class MainActivity extends AppCompatActivity
 
         } else if (id == R.id.main) {
 
+        } else if (id == R.id.login) {
+            Intent var6 = new Intent(this, LoginActivity.class);
+            PendingIntent var9 = TaskStackBuilder.create(this).addNextIntentWithParentStack(var6).getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+            (new android.support.v4.app.NotificationCompat.Builder(this)).setContentIntent(var9);
+            this.startActivity(var6);
         } else if (id == R.id.map) {
             // Use TaskStackBuilder to build the back stack and get the PendingIntent
             Intent detailsIntent = new Intent(this, MapActivity.class);
@@ -559,4 +565,14 @@ public class MainActivity extends AppCompatActivity
         updated = true;
         startRecording(updated);
     }
+
+
+    public void startServerService() {
+
+        Log.d("Main", "Start service ICI");
+        Intent var2 = new Intent(this.getApplication(), ServerService.class);
+        this.getApplication().startService(var2);
+
+    }
+
 }

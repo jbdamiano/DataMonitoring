@@ -149,6 +149,39 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     return states;
   }
 
+  public List<State> getAllStatesSinceId(long id) {
+      List<State> states = new ArrayList<>();
+      StringBuilder selectQueryBuild = new StringBuilder();
+      selectQueryBuild.append("SELECT  * FROM states WHERE id > ");
+      selectQueryBuild.append(id);
+      selectQueryBuild.append(" ORDER BY ");
+      selectQueryBuild.append("id");
+      String selectQuery = selectQueryBuild.toString();
+      SQLiteDatabase db = this.getWritableDatabase();
+      Cursor cursor = db.rawQuery(selectQuery, (String[])null);
+      if (cursor.moveToFirst()) {
+        do {
+          State state = new State();
+          state.setId(cursor.getInt(cursor.getColumnIndex("id")));
+          state.setState(cursor.getString(cursor.getColumnIndex("state")));
+          state.setReason(cursor.getString(cursor.getColumnIndex("reason")));
+          state.setSubtype(cursor.getString(cursor.getColumnIndex("networktype")));
+          state.setTimestamp(cursor.getString(cursor.getColumnIndex("timestamp")));
+          state.setLatitude(cursor.getDouble(cursor.getColumnIndex("latitude")));
+          state.setLongitude(cursor.getDouble(cursor.getColumnIndex("longitude")));
+          state.setOperator(cursor.getString(cursor.getColumnIndex("operator")));
+          state.setImsi(cursor.getString(cursor.getColumnIndex("imsi")));
+          state.setTrace(cursor.getInt(cursor.getColumnIndex("trace")));
+          state.setProvider(cursor.getString(cursor.getColumnIndex("provider")));
+          state.setSpeed(cursor.getFloat(cursor.getColumnIndex("speed")));
+          states.add(state);
+        } while(cursor.moveToNext());
+      }
+
+      db.close();
+      return states;
+  }
+
   public int getStateCount() {
     String countQuery = "SELECT  * FROM " + State.TABLE_NAME;
     SQLiteDatabase db = this.getReadableDatabase();
