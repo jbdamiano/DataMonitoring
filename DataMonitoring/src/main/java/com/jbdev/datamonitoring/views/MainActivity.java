@@ -240,6 +240,7 @@ public class MainActivity extends AppCompatActivity
             alert.show();
 
         } else if (id == R.id.start) {
+            Log.d("MainActivity", " start menu" + locationChangeRecording);
             locationChangeRecording = !locationChangeRecording;
             if (locationChangeRecording) {
                 item.setTitle("stop recording location");
@@ -257,12 +258,15 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onResume() {
-        Logger.dump("onResume");
+        Log.d("MainActivity", "onResume " + locationChangeRecording);
+        Logger.dump("onResume " + locationChangeRecording);
         super.onResume();
         if (statesCollection.getList() != null) {
             mAdapter.updateData(statesCollection.getList());
         }
         updateMenuTitle();
+        Log.d("MainActivity", "onResume " + locationChangeRecording);
+        Logger.dump("onResume " + locationChangeRecording);
     }
 
     @Override
