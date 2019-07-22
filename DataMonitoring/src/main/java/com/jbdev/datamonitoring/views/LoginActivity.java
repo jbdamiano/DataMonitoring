@@ -44,8 +44,8 @@ public class LoginActivity extends AppCompatActivity {
                 public void onClick(View var1) {
                         Builder var5;
                         try {
-                            //ServerInterface.connect(LoginActivity.this.email.getText().toString(), LoginActivity.this.password.getText().toString());
-                            ServerInterface.connect("jbdamiano@gmail.com", "test");
+                            ServerInterface.connect(email.getText().toString(), password.getText().toString());
+                            //ServerInterface.connect("jbdamiano@gmail.com", "test");
                             LoginActivity.this.finish();
                         } catch (JSONException var3) {
                             var5 = new Builder(LoginActivity.this);
