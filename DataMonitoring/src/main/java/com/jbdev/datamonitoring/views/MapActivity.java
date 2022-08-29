@@ -1,63 +1,85 @@
 package com.jbdev.datamonitoring.views;
 
+import android.content.Context;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.PolylineOptions;
+
+
 import com.jbdev.datamonitoring.R;
 import com.jbdev.datamonitoring.database.model.State;
 import com.jbdev.datamonitoring.datas.StatesCollection;
+import com.mapbox.mapboxsdk.Mapbox;
+import com.mapbox.mapboxsdk.annotations.MarkerOptions;
+import com.mapbox.mapboxsdk.annotations.PolylineOptions;
+import com.mapbox.mapboxsdk.camera.CameraPosition;
+import com.mapbox.mapboxsdk.camera.CameraUpdate;
+import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
+import com.mapbox.mapboxsdk.maps.MapView;
+import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.maps.Style;
 
 import java.util.List;
 
-public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class MapActivity extends AppCompatActivity implements com.mapbox.mapboxsdk.maps.OnMapReadyCallback {
 
-    private GoogleMap mMap;
+    private MapView mMap;
     boolean move = false;
+    private MapboxMap mMap2;
+
+
+    private String getMapTilerKey(){
+        PackageManager pm = getApplicationContext().getPackageManager();
+        try {
+            return pm.getApplicationInfo("com.jbdev.datamonitoring",
+                    PackageManager.GET_META_DATA
+            ).metaData.getString("com.maptiler.simplemap.mapTilerKey");
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
+        Mapbox.getInstance(this, null);
         setContentView(R.layout.activity_map);
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
+        mMap = findViewById(R.id.mapView);
+        mMap.onCreate(savedInstanceState);
+
+        mMap.getMapAsync(this);
     }
+
 
     private void display(LatLng pos, String etat, String subscriber, String imsi) {
         Log.d("MApActivity", "display " + pos + " " + etat);
         MarkerOptions markerOptions = new MarkerOptions();
-        markerOptions.title(subscriber + ":" + imsi);
-        markerOptions.visible(true);
-        markerOptions.position(pos);
-        switch (etat) {
-            case "CONNECTED":
-                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
-                break;
-            case "DISCONNECTED":
-                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
-                break;
-            default:
-                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW));
+        markerOptions.title(subscriber + ":" + etat);
 
-                break;
-        }
-        mMap.addMarker(markerOptions);
+        markerOptions.position(pos);
+
+        mMap2.addMarker(markerOptions);
         if (!move) {
-            mMap.moveCamera(CameraUpdateFactory.newLatLng(pos));
-            mMap.animateCamera(CameraUpdateFactory.zoomTo(15), 2000, null);
-            move = true;
+
+            mMap2.animateCamera(CameraUpdateFactory.newCameraPosition(
+                    new CameraPosition.Builder()
+                            .target(pos)
+                            .zoom(15)
+                            .build()
+            ),2000);
+
         }
+
     }
 
 
@@ -71,12 +93,110 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
      * installed Google Play services and returned to the app.
      */
     @Override
-    public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap;
+    public void onMapReady(@NonNull MapboxMap mapboxMap) {
+        mMap2 = mapboxMap;
+
+        String  mapTilerKey = getMapTilerKey();
+
+        String  styleUrl = "https://api.maptiler.com/maps/streets/style.json?key=xYfr8jK8KtfyCjRGLMLi";
+
+        mMap2.setStyle(styleUrl, new Style.OnStyleLoaded() {
+
+            @Override
+            public void onStyleLoaded(@NonNull Style style) {
+                Log.d("MApActivity", "ici2");
+                List<State> states = StatesCollection.getInstamce().getList();
+
+                mMap2.clear();
+
+                LatLng oldpos = null;
+                String oldEtat = null;
+                String oldSubscriber= null;
+                String oldImsi = null;
+
+                for (State state : states) {
+                    Log.d("MApActivity", "ici");
+                    if (state.getLatitude() == 0 && state.getLongitude() == 0) {
+                        continue;
+                    }
+                    Log.d("MApActivity", "ici 3");
+                    LatLng pos = new LatLng(state.getLatitude(), state.getLongitude());
+
+                    String etat = state.getState();
+                    String subscriber = state.getOperator();
+                    String imsi = state.getImsi();
+                    int trace = state.getTrace();
+
+
+                    if (trace == 0) {
+                        Log.d("MApActivity", "call display");
+                        display(pos, etat, subscriber, imsi);
+                    }
+
+                    if (trace == 1) {
+                        Log.d("MApActivity", "trace = 1");
+                        if (oldpos == null) {
+                            oldpos = pos;
+                            oldEtat = etat;
+                            oldSubscriber = subscriber;
+                            oldImsi = imsi;
+                            Log.d("MApActivity", "display oldpos");
+                            display(pos, etat, subscriber, imsi);
+                        } else {
+                            // Discard excessive speed 42m/s => 151.2 km/h
+
+                            if (state.getSpeed() > 42) {
+                                continue;
+                            }
+                            int color;
+                            switch (oldEtat) {
+                                case "CONNECTED":
+                                    color = Color.GREEN;
+                                    break;
+                                case "DISCONNECTED":
+                                    color = Color.RED;
+                                    break;
+                                default:
+                                    color = Color.YELLOW;
+
+                                    break;
+                            }
+                            mMap2.addPolyline(new PolylineOptions()
+                                    .add(oldpos, pos)
+                                    .width(15)
+                                    .color(color));
+                            if (!oldEtat.equals(etat)) {
+                                display(oldpos, oldEtat, oldSubscriber, oldImsi);
+                                display(pos, etat, subscriber, imsi);
+
+                            }
+                            oldpos = pos;
+                            oldEtat = etat;
+                            oldSubscriber = subscriber;
+                            oldImsi = imsi;
+                        }
+
+                    } else {
+                        if (oldpos != null) {
+                            Log.d("MApActivity", "display End loop");
+                            display(oldpos, oldEtat, oldSubscriber, oldImsi);
+                        }
+                        oldpos = null;
+                    }
+                }
+                if (oldpos != null) {
+                    Log.d("MApActivity", "oldpos");
+                    Log.d("MApActivity", "display End loop");
+                    display(oldpos, oldEtat, oldSubscriber, oldImsi);
+                }
+                oldpos = null;
+            }
+        });
+
 
         List<State> states = StatesCollection.getInstamce().getList();
 
-        mMap.clear();
+        mMap2.clear();
 
         LatLng oldpos = null;
         String oldEtat = null;
@@ -130,7 +250,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
                             break;
                     }
-                    mMap.addPolyline(new PolylineOptions()
+                    mMap2.addPolyline(new PolylineOptions()
                             .add(oldpos, pos)
                             .width(15)
                             .color(color));
@@ -159,4 +279,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
         oldpos = null;
     }
+
+
+
+
 }

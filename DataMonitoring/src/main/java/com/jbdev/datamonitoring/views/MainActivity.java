@@ -10,25 +10,26 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.provider.Settings;
-import android.support.annotation.NonNull;
-import android.support.design.widget.NavigationView;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.TaskStackBuilder;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
+import androidx.annotation.NonNull;
+import com.google.android.material.navigation.NavigationView;
+import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.TaskStackBuilder;
+import androidx.core.content.ContextCompat;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.appcompat.widget.Toolbar;
 import android.telephony.SubscriptionInfo;
 import android.telephony.SubscriptionManager;
 import android.util.Log;
@@ -74,10 +75,18 @@ public class MainActivity extends AppCompatActivity
         return instance;
     }
 
+
+
     public void startStateService() {
         if (!stateServiceStarted) {
             final Intent intentState = new Intent(this.getApplication(), BackgroundStateService.class);
-            this.getApplication().startService(intentState);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+
+                ContextCompat.startForegroundService(this.getApplicationContext(), intentState);
+                //this.getApplication().startForegroundService(intentState);
+            } else {
+                this.getApplication().startService(intentState);
+            }
             stateServiceStarted = true;
         }
     }
@@ -193,7 +202,7 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.login) {
             Intent var6 = new Intent(this, LoginActivity.class);
             PendingIntent var9 = TaskStackBuilder.create(this).addNextIntentWithParentStack(var6).getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
-            (new android.support.v4.app.NotificationCompat.Builder(this)).setContentIntent(var9);
+            (new androidx.core.app.NotificationCompat.Builder(this)).setContentIntent(var9);
             this.startActivity(var6);
         } else if (id == R.id.map) {
             // Use TaskStackBuilder to build the back stack and get the PendingIntent
@@ -311,7 +320,25 @@ public class MainActivity extends AppCompatActivity
         }
     }
     private void checkAndAskForPermission() {
+
         if (ContextCompat.checkSelfPermission(MainActivity.this,
+                Manifest.permission.FOREGROUND_SERVICE)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            // Permission is not granted
+            // Should we show an explanation?
+            if (!ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this,
+                    Manifest.permission.FOREGROUND_SERVICE)) {
+                // No explanation needed; request the permission
+                ActivityCompat.requestPermissions(MainActivity.this,
+                        new String[]{Manifest.permission.FOREGROUND_SERVICE},
+                        2);
+
+                // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
+                // app-defined int constant. The callback method gets the
+                // result of the request.
+            }
+        }else if (ContextCompat.checkSelfPermission(MainActivity.this,
                 Manifest.permission.ACCESS_COARSE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
 
@@ -341,23 +368,6 @@ public class MainActivity extends AppCompatActivity
                 ActivityCompat.requestPermissions(MainActivity.this,
                         new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                         2);
-
-                // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
-                // app-defined int constant. The callback method gets the
-                // result of the request.
-            }
-        } else if (ContextCompat.checkSelfPermission(MainActivity.this,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED) {
-
-            // Permission is not granted
-            // Should we show an explanation?
-            if (!ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                // No explanation needed; request the permission
-                ActivityCompat.requestPermissions(MainActivity.this,
-                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                        3);
 
                 // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
                 // app-defined int constant. The callback method gets the
@@ -431,23 +441,19 @@ public class MainActivity extends AppCompatActivity
 
             }
 
-            SubscriptionManager sm = SubscriptionManager.from(this);
 
-            List<SubscriptionInfo> sis = sm.getActiveSubscriptionInfoList();
 
-            if (sis != null) {
-                // getting first SubscriptionInfo
-                SubscriptionInfo si = sis.get(0);
-
-                // getting iccId
-                String iccId = si.getIccId();
-                Log.d("********************", iccId);
-                Logger.dump("******************** ICCID: " + iccId);
-            }
             final Intent intent = new Intent(this.getApplication(), BackgroundLocationService.class);
-            this.getApplication().startService(intent);
 
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                this.getApplication().startForegroundService(intent);
+
+            } else {
+                this.getApplication().startService(intent);
+
+            }
             startStateService();
+
 
         }
     }
@@ -464,6 +470,7 @@ public class MainActivity extends AppCompatActivity
             int requestCode,
             @NonNull String permissions[],
             @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode) {
             case 1:
                 if (grantResults.length <= 0

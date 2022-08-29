@@ -37,27 +37,9 @@ public class ConnectivityChangeReceiver extends BroadcastReceiver {
         }
         TelephonyManager teleman = (TelephonyManager) activity.getSystemService(Context.TELEPHONY_SERVICE);
         String operatorName = teleman.getNetworkOperatorName();
-        @SuppressLint({"HardwareIds", "MissingPermission"}) String imsi = teleman.getSubscriberId();
-        String imsiName = "Unkown";
-        if (imsi != null) {
-            String subsim = imsi.substring(0, 5);
 
-            if (subsim.equalsIgnoreCase("20801")) {
-                imsiName = "Orange";
-            } else if (subsim.equalsIgnoreCase("20824")) {
-                imsiName = "MBQT";
-            } else if (subsim.equalsIgnoreCase("23450")) {
-                imsiName = "JT";
-            } else if (subsim.equalsIgnoreCase("20601")) {
-                imsiName = "BICS";
-            } else if (subsim.equalsIgnoreCase("22201")) {
-                imsiName = "Sparkle";
-            } else if (subsim.equalsIgnoreCase("42402")) {
-                imsiName = "Etisalat";
-            } else {
-                imsiName = imsi;
-            }
-        }
+        String imsiName = "Unkown";
+
         return imsiName;
     }
 
@@ -147,27 +129,10 @@ public class ConnectivityChangeReceiver extends BroadcastReceiver {
         String stateString;
 
         String operatorName = teleman.getNetworkOperatorName();
-        @SuppressLint("HardwareIds") String imsi = teleman.getSubscriberId();
-        String imsiName = "Unknown";
-        if (imsi != null) {
-            String subsim = imsi.substring(0, 5);
 
-            if (subsim.equalsIgnoreCase("20801")) {
-                imsiName = "Orange";
-            } else if (subsim.equalsIgnoreCase("20824")) {
-                imsiName = "MBQT";
-            } else if (subsim.equalsIgnoreCase("23450")) {
-                imsiName = "JT";
-            } else if (subsim.equalsIgnoreCase("20601")) {
-                imsiName = "BICS";
-            } else if (subsim.equalsIgnoreCase("22201")) {
-                imsiName = "Sparkle";
-            } else if (subsim.equalsIgnoreCase("42402")) {
-                imsiName = "Etisalat";
-            } else {
-                imsiName = imsi;
-            }
-        }
+        String imsiName = "Unknown";
+
+
 
 
         // Bundle extras = intent.getExtras();

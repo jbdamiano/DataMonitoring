@@ -6,8 +6,8 @@
 package com.jbdev.datamonitoring.views;
 
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.app.AlertDialog.Builder;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AlertDialog.Builder;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
