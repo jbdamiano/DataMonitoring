@@ -82,7 +82,7 @@ public class StatesAdapter extends RecyclerView.Adapter<StatesAdapter.MyViewHold
         holder.dot.setText(Html.fromHtml("&#8226;"));
 
         // Formatting and displaying timestamp
-        holder.subtype.setText(String.format("%s %s %s", state.getSubtype(), state.getOperator(), state.getImsi()));
+        holder.subtype.setText(String.format("%s %s", state.getSubtype(), state.getOperator()));
 
         // Formatting and displaying timestamp
         holder.timestamp.setText(state.getTimestamp());

@@ -112,7 +112,7 @@ public class ServerInterface {
     }
 
     public static void sendData(Double latitude, Double longitude, String state, String operator,
-                                String imsi, Integer recording, String gps, Float speed,
+                                Integer recording, String gps, Float speed,
                                 String timestamp, String reason, String networkType, Integer id,
                                 Long currentId) throws JSONException, IOException {
         JSONObject json = new JSONObject();
@@ -123,7 +123,6 @@ public class ServerInterface {
         json.put("longitude", longitude);
         json.put("state", state);
         json.put("operator", operator);
-        json.put("imsi", imsi);
         json.put("recording", recording);
         json.put("gps operator", gps);
         json.put("speed", speed);

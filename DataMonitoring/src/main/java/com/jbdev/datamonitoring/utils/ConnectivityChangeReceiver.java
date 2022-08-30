@@ -77,6 +77,9 @@ public class ConnectivityChangeReceiver extends BroadcastReceiver {
 
         String networkTypeString;
         switch (teleman.getDataNetworkType()) {
+            case 0:
+                networkTypeString = "WIFI";
+                return;
             case TelephonyManager.NETWORK_TYPE_GPRS:
                 networkTypeString = "GPRS";
                 break;
@@ -130,7 +133,6 @@ public class ConnectivityChangeReceiver extends BroadcastReceiver {
 
         String operatorName = teleman.getNetworkOperatorName();
 
-        String imsiName = "Unknown";
 
 
 
@@ -196,53 +198,22 @@ public class ConnectivityChangeReceiver extends BroadcastReceiver {
                 reason = "None";
             }
 
-            if (!stateString.equals("CONNECTED") && timer == null) {
-                timer = new Timer();
-                timer.scheduleAtFixedRate(new TimerTask() {
-                    @Override
-                    public void run() {
-                        String imsi = getImsi();
-                        if (!imsi.equals(lastImsiName)) {
-                            MainActivity activity = MainActivity.getInstance();
-                            if (activity == null) {
-                                return;
-                            }
-                            CurrentStateAndLocation currentStateAndLocation = CurrentStateAndLocation.getInstance();
-                            currentStateAndLocation.setImsi(imsi);
-                            currentStateAndLocation.setOperator("");
-                            currentStateAndLocation.setSubtype("");
-                            currentStateAndLocation.setReason("");
-                            currentStateAndLocation.setState(lastState);
-                            activity.createState(lastState, "", "", "", imsi);
-                            lastImsiName = imsi;
-                        }
-                    }
-                }, 0, 1000);
-            } else {
-                if (timer != null) {
-                    timer.cancel();
-                    timer = null;
-                }
-            }
-
 
             Logger.dump("------------------------");
             Logger.dump("Last Value:" + lastState + ", " + lastNetworkTypeString + ", " + lastOperatorName + ", " + lastImsiName);
-            Logger.dump("New Value :" + stateString + ", " + networkTypeString + ", " + operatorName + ", " + imsiName);
+            Logger.dump("New Value :" + stateString + ", " + networkTypeString + ", " + operatorName );
 
 
-            if (!stateString.equals(lastState) || !networkTypeString.equals(lastNetworkTypeString) || !operatorName.equals(lastOperatorName) || !imsiName.equals(lastImsiName)) {
+            if (!stateString.equals(lastState) || !networkTypeString.equals(lastNetworkTypeString) || !operatorName.equals(lastOperatorName) ) {
                 CurrentStateAndLocation currentStateAndLocation = CurrentStateAndLocation.getInstance();
-                currentStateAndLocation.setImsi(imsiName);
                 currentStateAndLocation.setOperator(operatorName);
                 currentStateAndLocation.setSubtype(networkTypeString);
                 currentStateAndLocation.setReason(reason);
                 currentStateAndLocation.setState(stateString);
-                activity.createState(stateString, reason, networkTypeString, operatorName, imsiName);
+                activity.createState(stateString, reason, networkTypeString, operatorName);
                 lastState = stateString;
                 lastNetworkTypeString = networkTypeString;
                 lastOperatorName = operatorName;
-                lastImsiName = imsiName;
             }
 
         }

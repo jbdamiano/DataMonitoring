@@ -63,7 +63,7 @@ public class BackgroundLocationService extends Service {
             if (MainActivity.getInstance().isLocationChangeRecording()){
                 MainActivity.getInstance().createState(currentStateAndLocation.getState(),
                         currentStateAndLocation.getReason(), currentStateAndLocation.getSubtype(),
-                        currentStateAndLocation.getOperator(),currentStateAndLocation.getImsi());
+                        currentStateAndLocation.getOperator());
             }
 
             //MainActivity.getInstance().startStateService();

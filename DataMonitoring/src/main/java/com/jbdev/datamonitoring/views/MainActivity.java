@@ -3,6 +3,7 @@ package com.jbdev.datamonitoring.views;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.PendingIntent;
+import android.content.ClipData;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -12,6 +13,7 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.provider.Settings;
@@ -21,6 +23,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.TaskStackBuilder;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -38,6 +41,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.widget.Toast;
 
+import com.jbdev.datamonitoring.BuildConfig;
 import com.jbdev.datamonitoring.R;
 import com.jbdev.datamonitoring.database.DatabaseHelper;
 import com.jbdev.datamonitoring.database.model.State;
@@ -170,7 +174,8 @@ public class MainActivity extends AppCompatActivity
 
         if (id == R.id.send) {
             // Handle the camera action
-            exportCsv();
+            Log.d("MAinAcitvity", "export CSV called");
+            exportCsv(MainActivity.this);
         } else if (id == R.id.delete) {
             AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this); //Read Update
             builder.setTitle("Delete");
@@ -321,7 +326,26 @@ public class MainActivity extends AppCompatActivity
     }
     private void checkAndAskForPermission() {
 
+
+
         if (ContextCompat.checkSelfPermission(MainActivity.this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            // Permission is not granted
+            // Should we show an explanation?
+            if (!ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                // No explanation needed; request the permission
+                ActivityCompat.requestPermissions(MainActivity.this,
+                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                        2);
+
+                // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
+                // app-defined int constant. The callback method gets the
+                // result of the request.
+            }
+        }else if (ContextCompat.checkSelfPermission(MainActivity.this,
                 Manifest.permission.FOREGROUND_SERVICE)
                 != PackageManager.PERMISSION_GRANTED) {
 
@@ -507,19 +531,25 @@ public class MainActivity extends AppCompatActivity
     }
 
     @SuppressLint("ShowToast")
-    public void exportCsv() {
-        @SuppressLint("SdCardPath") File myFile = new File("/sdcard/export.csv");
+    public void exportCsv(Context context) {
+
+        File path = Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_DOWNLOADS);
+
+        @SuppressLint("SdCardPath") File myFile = new File(path,  "/export.csv");
+        Log.d("MainActivity", "file is : " + myFile);
         try {
+            path.mkdirs();
             final boolean newFile = myFile.createNewFile();
             FileOutputStream fOut = new FileOutputStream(myFile);
             OutputStreamWriter myOutWriter = new OutputStreamWriter(fOut);
-            myOutWriter.append("timestamp;state;reason;networktype;operator;imsi;latitude;longitude;recording;gps operator; speed\n");
+            myOutWriter.append("timestamp;state;reason;networktype;operator;latitude;longitude;recording;gps operator; speed\n");
             List<State> states = db.getAllStates();
             for (State state : states) {
                 myOutWriter.append(state.getTimestamp()).append(";").append(state.getState()).
                         append(";").append(state.getReason()).append(";").
                         append(state.getSubtype()).append(";").append(state.getOperator()).
-                        append(";").append(state.getImsi()).append(";").
+                        append(";").append(";").
                         append(String.valueOf(state.getLatitude())).append(";").
                         append(String.valueOf(state.getLongitude())).append(";").
                         append(String.valueOf(state.getTrace())).append(";").
@@ -528,7 +558,11 @@ public class MainActivity extends AppCompatActivity
             myOutWriter.close();
             Uri u1;
 
-            u1 = Uri.fromFile(myFile);
+            u1 = FileProvider.getUriForFile(MainActivity.this, BuildConfig.APPLICATION_ID + ".provider",myFile);
+
+                  //  Uri.fromFile(myFile);
+
+            Log.d("MainActivity", "prepare intent");
 
             Intent sendIntent = new Intent(Intent.ACTION_SEND);
             sendIntent.putExtra(Intent.EXTRA_SUBJECT, "state export");
@@ -539,6 +573,7 @@ public class MainActivity extends AppCompatActivity
 
 
         } catch (Exception e) {
+            Log.e("MainActivity", "error", e);
             Toast.makeText(MainActivity.this, "Error exporting", Toast.LENGTH_LONG);
         }
 
@@ -561,8 +596,8 @@ public class MainActivity extends AppCompatActivity
     };
 
 
-    public void createState(String state, String reason, String subtype, String operator, String imsi) {
-        long id = db.insertState(state, reason, subtype, operator, imsi,
+    public void createState(String state, String reason, String subtype, String operator) {
+        long id = db.insertState(state, reason, subtype, operator,
                 currentStateAndLocation.getLatitude(), currentStateAndLocation.getLongitude(),
                 locationChangeRecording ? 1 : 0,
                 currentStateAndLocation.getProvider(), currentStateAndLocation.getSpeed());

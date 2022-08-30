@@ -37,7 +37,7 @@ public class Task extends TimerTask {
 
             try {
                 ServerInterface.sendData(state.getLatitude(), state.getLongitude(),
-                        state.getState(), state.getOperator(), state.getImsi(), state.getTrace(),
+                        state.getState(), state.getOperator(), state.getTrace(),
                         state.getProvider(), state.getSpeed(), state.getTimestamp(),
                         state.getReason(), state.getSubtype(), state.getId(), currentId);
                 if (state.getId() > id) {

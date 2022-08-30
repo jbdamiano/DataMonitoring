@@ -7,7 +7,6 @@ public class State {
     public static final String COLUMN_STATE = "state";
     public static final String COLUMN_NETWORKTYPE = "networktype";
     public static final String COLUMN_OPERATOR = "operator";
-    public static final String COLUMN_IMSI = "imsi";
     public static final String COLUMN_LATITUDE = "latitude";
     public static final String COLUMN_LONGITUDE = "longitude";
 
@@ -23,7 +22,6 @@ public class State {
     private Double longitude;
     private Double latitude;
     private String operator;
-    private String imsi;
     private String reason;
     private String provider;
     private Float speed;
@@ -37,7 +35,6 @@ public class State {
                     + COLUMN_REASON + " TEXT,"
                     + COLUMN_NETWORKTYPE + " TEXT,"
                     + COLUMN_OPERATOR + " TEXT,"
-                    + COLUMN_IMSI + " TEXT,"
                     + COLUMN_LATITUDE + " REAL,"
                     + COLUMN_LONGITUDE + " REAL,"
                     + COLUMN_PROVIDER + " TEXT,"
@@ -49,7 +46,7 @@ public class State {
     public State() {
     }
 
-    public State(int id, String state, String reason, String subtype, String timestamp, String operator, String imsi, Double latitude, Double longitude, int trace, String provider, Float speed) {
+    public State(int id, String state, String reason, String subtype, String timestamp, String operator, Double latitude, Double longitude, int trace, String provider, Float speed) {
         this.id = id;
         this.state = state;
         this.reason = reason;
@@ -58,7 +55,6 @@ public class State {
         this.longitude = longitude;
         this.latitude = latitude;
         this.operator = operator;
-        this.imsi = imsi;
         this.trace = trace;
         this.provider = provider;
         this.speed = speed;
@@ -148,16 +144,8 @@ public class State {
         this.latitude = latitude;
     }
 
-    public void setImsi(String imsi) {
-        this.imsi = imsi;
-    }
-
     public void setOperator(String operator) {
         this.operator = operator;
-    }
-
-    public String getImsi() {
-        return imsi;
     }
 
     public String getOperator() {

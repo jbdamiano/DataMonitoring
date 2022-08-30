@@ -79,14 +79,6 @@ public class CurrentStateAndLocation {
         }
     }
 
-    public String getImsi() {
-        return imsi;
-    }
-
-    public void setImsi(String imsi) {
-        this.imsi = imsi;
-    }
-
     private static CurrentStateAndLocation instance = null;
 
     private CurrentStateAndLocation() {

@@ -61,7 +61,7 @@ public class MapActivity extends AppCompatActivity implements com.mapbox.mapboxs
     }
 
 
-    private void display(LatLng pos, String etat, String subscriber, String imsi) {
+    private void display(LatLng pos, String etat, String subscriber) {
         Log.d("MApActivity", "display " + pos + " " + etat);
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.title(subscriber + ":" + etat);
@@ -112,7 +112,6 @@ public class MapActivity extends AppCompatActivity implements com.mapbox.mapboxs
                 LatLng oldpos = null;
                 String oldEtat = null;
                 String oldSubscriber= null;
-                String oldImsi = null;
 
                 for (State state : states) {
                     Log.d("MApActivity", "ici");
@@ -124,13 +123,12 @@ public class MapActivity extends AppCompatActivity implements com.mapbox.mapboxs
 
                     String etat = state.getState();
                     String subscriber = state.getOperator();
-                    String imsi = state.getImsi();
                     int trace = state.getTrace();
 
 
                     if (trace == 0) {
                         Log.d("MApActivity", "call display");
-                        display(pos, etat, subscriber, imsi);
+                        display(pos, etat, subscriber);
                     }
 
                     if (trace == 1) {
@@ -139,9 +137,8 @@ public class MapActivity extends AppCompatActivity implements com.mapbox.mapboxs
                             oldpos = pos;
                             oldEtat = etat;
                             oldSubscriber = subscriber;
-                            oldImsi = imsi;
                             Log.d("MApActivity", "display oldpos");
-                            display(pos, etat, subscriber, imsi);
+                            display(pos, etat, subscriber);
                         } else {
                             // Discard excessive speed 42m/s => 151.2 km/h
 
@@ -166,20 +163,19 @@ public class MapActivity extends AppCompatActivity implements com.mapbox.mapboxs
                                     .width(15)
                                     .color(color));
                             if (!oldEtat.equals(etat)) {
-                                display(oldpos, oldEtat, oldSubscriber, oldImsi);
-                                display(pos, etat, subscriber, imsi);
+                                display(oldpos, oldEtat, oldSubscriber);
+                                display(pos, etat, subscriber);
 
                             }
                             oldpos = pos;
                             oldEtat = etat;
                             oldSubscriber = subscriber;
-                            oldImsi = imsi;
                         }
 
                     } else {
                         if (oldpos != null) {
                             Log.d("MApActivity", "display End loop");
-                            display(oldpos, oldEtat, oldSubscriber, oldImsi);
+                            display(oldpos, oldEtat, oldSubscriber);
                         }
                         oldpos = null;
                     }
@@ -187,7 +183,7 @@ public class MapActivity extends AppCompatActivity implements com.mapbox.mapboxs
                 if (oldpos != null) {
                     Log.d("MApActivity", "oldpos");
                     Log.d("MApActivity", "display End loop");
-                    display(oldpos, oldEtat, oldSubscriber, oldImsi);
+                    display(oldpos, oldEtat, oldSubscriber);
                 }
                 oldpos = null;
             }
@@ -201,7 +197,7 @@ public class MapActivity extends AppCompatActivity implements com.mapbox.mapboxs
         LatLng oldpos = null;
         String oldEtat = null;
         String oldSubscriber= null;
-        String oldImsi = null;
+
 
         for (State state : states) {
 
@@ -212,12 +208,11 @@ public class MapActivity extends AppCompatActivity implements com.mapbox.mapboxs
 
             String etat = state.getState();
             String subscriber = state.getOperator();
-            String imsi = state.getImsi();
             int trace = state.getTrace();
 
 
             if (trace == 0) {
-                display(pos, etat, subscriber, imsi);
+                display(pos, etat, subscriber);
             }
 
             if (trace == 1) {
@@ -228,9 +223,8 @@ public class MapActivity extends AppCompatActivity implements com.mapbox.mapboxs
                     oldpos = pos;
                     oldEtat = etat;
                     oldSubscriber = subscriber;
-                    oldImsi = imsi;
                     Log.d("MApActivity", "display oldpos");
-                    display(pos, etat, subscriber, imsi);
+                    display(pos, etat, subscriber);
                 } else {
                     // Discard excessive speed 42m/s => 151.2 km/h
 
@@ -255,27 +249,26 @@ public class MapActivity extends AppCompatActivity implements com.mapbox.mapboxs
                             .width(15)
                             .color(color));
                     if (!oldEtat.equals(etat)) {
-                        display(oldpos, oldEtat, oldSubscriber, oldImsi);
-                        display(pos, etat, subscriber, imsi);
+                        display(oldpos, oldEtat, oldSubscriber);
+                        display(pos, etat, subscriber);
 
                     }
                     oldpos = pos;
                     oldEtat = etat;
                     oldSubscriber = subscriber;
-                    oldImsi = imsi;
                 }
 
             } else {
                 if (oldpos != null) {
                     Log.d("MApActivity", "display End loop");
-                    display(oldpos, oldEtat, oldSubscriber, oldImsi);
+                    display(oldpos, oldEtat, oldSubscriber);
                 }
                 oldpos = null;
             }
         }
         if (oldpos != null) {
             Log.d("MApActivity", "display End loop");
-            display(oldpos, oldEtat, oldSubscriber, oldImsi);
+            display(oldpos, oldEtat, oldSubscriber);
         }
         oldpos = null;
     }
