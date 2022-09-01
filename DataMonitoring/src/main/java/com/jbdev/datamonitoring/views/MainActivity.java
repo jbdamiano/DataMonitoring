@@ -58,7 +58,10 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -73,7 +76,7 @@ public class MainActivity extends AppCompatActivity
     public BackgroundLocationService gpsService;
     public boolean stateServiceStarted = false;
     static private boolean locationChangeRecording = false;
-    static private boolean updated = false;
+    static private boolean updated = true;
 
     public static MainActivity getInstance() {
         return instance;
@@ -174,7 +177,7 @@ public class MainActivity extends AppCompatActivity
 
         if (id == R.id.send) {
             // Handle the camera action
-            Log.d("MAinAcitvity", "export CSV called");
+            Log.d("MAinActivity", "export CSV called");
             exportCsv(MainActivity.this);
         } else if (id == R.id.delete) {
             AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this); //Read Update
@@ -536,7 +539,13 @@ public class MainActivity extends AppCompatActivity
         File path = Environment.getExternalStoragePublicDirectory(
                 Environment.DIRECTORY_DOWNLOADS);
 
-        @SuppressLint("SdCardPath") File myFile = new File(path,  "/export.csv");
+
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss", Locale.US);
+        Date now = new Date();
+
+
+
+        @SuppressLint("SdCardPath") File myFile = new File(path,  "/export " + formatter.format(now) +".csv");
         Log.d("MainActivity", "file is : " + myFile);
         try {
             path.mkdirs();
