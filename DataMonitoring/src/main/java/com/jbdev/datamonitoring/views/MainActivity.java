@@ -215,13 +215,21 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.map) {
             // Use TaskStackBuilder to build the back stack and get the PendingIntent
             Intent detailsIntent = new Intent(this, MapActivity.class);
-            PendingIntent pendingIntent =
-                    TaskStackBuilder.create(this)
-                            // add all of DetailsActivity's parents to the stack,
-                            // followed by DetailsActivity itself
-                            .addNextIntentWithParentStack(detailsIntent)
-                            .getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+            PendingIntent pendingIntent = null;
 
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+                pendingIntent = TaskStackBuilder.create(this)
+                        // add all of DetailsActivity's parents to the stack,
+                        // followed by DetailsActivity itself
+                        .addNextIntentWithParentStack(detailsIntent)
+                        .getPendingIntent(0, PendingIntent.FLAG_MUTABLE);
+            }else {
+                pendingIntent = TaskStackBuilder.create(this)
+                        // add all of DetailsActivity's parents to the stack,
+                        // followed by DetailsActivity itself
+                        .addNextIntentWithParentStack(detailsIntent)
+                        .getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+            }
             NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
             builder.setContentIntent(pendingIntent);
             // Intent launchNewIntent = new Intent(MainActivity.this,MapActivity.class);

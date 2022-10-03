@@ -35,6 +35,7 @@ public class MapActivity extends AppCompatActivity implements com.mapbox.mapboxs
 
 
     private String getMapTilerKey(){
+        Log.i("MapActivity", "getMapTilerKey");
         PackageManager pm = getApplicationContext().getPackageManager();
         try {
             return pm.getApplicationInfo("com.jbdev.datamonitoring",
@@ -49,6 +50,7 @@ public class MapActivity extends AppCompatActivity implements com.mapbox.mapboxs
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.i("MapActivity", "onCreate");
         super.onCreate(savedInstanceState);
 
 
@@ -94,6 +96,7 @@ public class MapActivity extends AppCompatActivity implements com.mapbox.mapboxs
      */
     @Override
     public void onMapReady(@NonNull MapboxMap mapboxMap) {
+        Log.i("MapActivity", "onMapReady");
         mMap2 = mapboxMap;
 
         String  mapTilerKey = getMapTilerKey();
